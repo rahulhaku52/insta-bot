@@ -1,0 +1,14 @@
+[
+  {
+    "id": "post1",
+    "media_url": "https://raw.githubusercontent.com/USERNAME/insta-bot/main/media/video1.mp4",
+    "caption": "আমার প্রথম auto reel 🎬 #reels",
+    "type": "REELS"
+  },
+  {
+    "id": "post2",
+    "media_url": "https://raw.githubusercontent.com/USERNAME/insta-bot/main/media/photo1.jpg",
+    "caption": "সুন্দর একটা ছবি 📸",
+    "type": "IMAGE"
+  }
+]
