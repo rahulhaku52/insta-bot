@@ -1,0 +1,32 @@
+name: Instagram Auto Post
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # প্রতিদিন UTC সকাল ৯টা
+  workflow_dispatch:        # হাতে চালানোর জন্য বাটন
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
+        run: python post.py
+
+      - name: Save posted.json
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add posted.json
+          git commit -m "update posted" || echo "no change"
+          git push
