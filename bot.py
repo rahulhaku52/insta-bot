@@ -4,14 +4,26 @@ import random
 import requests
 from datetime import datetime
 
-# ========== সিক্রেটস ==========
+# ========== সিক্রেটস লোড ==========
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 CHANNEL_ID = os.environ.get('CHANNEL_ID')
 NEWS_API_KEY = os.environ.get('NEWS_API_KEY')
 
-if not all([BOT_TOKEN, CHANNEL_ID, NEWS_API_KEY]):
-    print("❌ ERROR: Secrets missing!")
+# ========== কোন কোন কী মিসিং, তা পরীক্ষা করা ==========
+missing_keys = []
+if not BOT_TOKEN:
+    missing_keys.append("BOT_TOKEN")
+if not CHANNEL_ID:
+    missing_keys.append("CHANNEL_ID")
+if not NEWS_API_KEY:
+    missing_keys.append("NEWS_API_KEY")
+
+if missing_keys:
+    print(f"❌ ERROR: These secrets are MISSING in GitHub Actions: {', '.join(missing_keys)}")
+    print("🔧 Please add them in: Repo -> Settings -> Secrets and variables -> Actions")
     exit(1)
+else:
+    print("✅ All secrets found successfully!")
 
 POSTED_FILE = 'posted_news.json'
 
@@ -48,7 +60,7 @@ def fetch_tech_news():
         print(f"Fetch Error: {e}")
         return []
 
-# ========== ক্লিন ফরম্যাটিং (HTML) ==========
+# ========== ফরম্যাটিং ==========
 def format_news_post(articles):
     posted = load_posted()
     new_articles = []
@@ -57,16 +69,13 @@ def format_news_post(articles):
         title = art.get('title', '')
         if title in posted or '[Removed]' in title or not title:
             continue
-        # ব্ল্যাকলিস্ট ওয়ার্ড বাদ (কিছু না)
         new_articles.append(art)
     
     if not new_articles:
         return None
 
-    # সর্বোচ্চ ৩টি নতুন নিউজ নাও
     selected = random.sample(new_articles, min(3, len(new_articles)))
     
-    # HTML বিল্ড (বোল্ড <b>, ব্রেক <br/> ব্যবহার)
     html_parts = []
     html_parts.append("<b>📰 TODAY'S TECH DIGEST</b>")
     html_parts.append("──────────────────")
@@ -79,17 +88,14 @@ def format_news_post(articles):
             if len(desc) > 90:
                 desc = desc[:90] + '...'
         
-        # সিকোয়েন্স
         html_parts.append(f"<b>▫️ {idx}. {title}</b>")
         if desc:
             html_parts.append(f"   {desc}")
-        html_parts.append("")  # ফাঁকা লাইন
+        html_parts.append("")
     
     html_parts.append("──────────────────")
-    # ক্লিন ফুটার (আর পুরানো বক্স নেই)
     html_parts.append("💡 <b>Want a Stunning Website?</b> Contact @hacker_52")
     
-    # পোস্ট হওয়া মার্ক করা
     for art in selected:
         posted.add(art.get('title'))
     save_posted(posted)
