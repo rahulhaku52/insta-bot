@@ -2,27 +2,24 @@ name: AI Tech Auto Poster
 
 on:
   schedule:
-    - cron: '0 */4 * * *'   # প্রতি ৪ ঘণ্টায় পোস্ট দেবে
-  workflow_dispatch:        # ম্যানুয়ালি চালানোর বাটন GitHub-এ রাখে
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: Install dependencies
         run: pip install -r requirements.txt
-
       - name: Run Auto Poster
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
         run: python bot.py
